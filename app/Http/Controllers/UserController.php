@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -59,7 +61,8 @@ class UserController extends Controller
     public function logout()
     {
         try {
-            Auth::logout();
+            Session::flush();
+            //Auth::logout();
             $success = true;
             $message = "Logout successfully";
         } catch (\Illuminate\Database\QueryException $ex) {

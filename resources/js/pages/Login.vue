@@ -89,7 +89,9 @@
 </template>
 
 <script type="ts">
-export default {
+import { defineComponent } from 'vue';
+export default defineComponent({
+
     data() {
         return {
             email: "",
@@ -127,5 +129,5 @@ export default {
         }
         next();
     },
-};
+});
 </script>

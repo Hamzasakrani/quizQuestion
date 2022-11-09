@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{{env('APP_NAME')}}</title>
     <link href="{{ mix('css/app.css') }}" type="text/css" rel="stylesheet" />
+
 </head>
 
 <body>
