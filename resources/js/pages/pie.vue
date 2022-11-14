@@ -11,15 +11,18 @@ export default {
   components: {
     apexchart: VueApexCharts,
   },
-
+  props: {
+    values: Array,
+    titles: Array,
+  },
   data: () => ({
-    series: [44, 55, 13, 43, 22],
+    series: [],
     chartOptions: {
       chart: {
         width: 380,
         type: "pie",
       },
-      labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
+      labels: [],
       responsive: [
         {
           breakpoint: 480,
@@ -35,5 +38,9 @@ export default {
       ],
     },
   }),
+  created() {
+    this.series = this.values;
+    this.chartOptions.labels = this.titles;
+  },
 };
 </script>

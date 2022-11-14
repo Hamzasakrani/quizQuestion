@@ -1,67 +1,47 @@
 <template>
-  <div direction="vertical" height="800px" class="stepper">
-    <div class="steps-container">
-      <div class="steps">
-        <div class="step" icon="fa fa-pencil-alt" id="1">
-          <div class="step-title">
-            <span class="step-number">01</span>
-            <div class="step-text">Basic Information</div>
-          </div>
-        </div>
-        <div class="step" icon="fa fa-info-circle" id="2">
-          <div class="step-title">
-            <span class="step-number">02</span>
-            <div class="step-text">Personal Data</div>
-          </div>
-        </div>
-        <div class="step" icon="fa fa-book-reader" id="3">
-          <div class="step-title">
-            <span class="step-number">03</span>
-            <div class="step-text">Terms and Conditions</div>
-          </div>
-        </div>
-        <div class="step" icon="fa fa-check" id="4">
-          <div class="step-title">
-            <span class="step-number">04</span>
-            <div class="step-text">Finish</div>
-          </div>
-        </div>
-        <div class="step" icon="fa fa-pencil-alt" id="5">
-          <div class="step-title">
-            <span class="step-number">05</span>
-            <div class="step-text">More</div>
-          </div>
-        </div>
-      </div>
+  <div>
+    <div v-if="showquestons">
+      <list-item v-for="(item, index) in questons"
+        ><h1>{{ item.title }}</h1>
+        <h4>{{ item.text }}</h4>
+        <vue3-star-ratings v-model="rating[index].value" :numberOfStars="5" :step="1" />
+      </list-item>
+      <button class="btn btn-success" @click="responseQuetions">Submit</button>
     </div>
-    <div class="stepper-content-container">
-      <div class="stepper-content fade-in" stepper-label="1">
-        <div>Step 1</div>
-      </div>
-      <div class="stepper-content fade-in" stepper-label="2">
-        <div>Step 2</div>
-      </div>
-      <div class="stepper-content fade-in" stepper-label="3">
-        <div>Step 3</div>
-      </div>
-      <div class="stepper-content fade-in" stepper-label="4">
-        <div>Step 4</div>
+    <div v-else>
+      <div class="container">
+        <div class="row">
+          <list-item class="col-6" v-for="item in questonsdata"
+            ><label>
+              <h4>{{ item.question }}</h4></label
+            >
+            <PieChart :titles="titles" :values="item.value"
+          /></list-item>
+        </div>
       </div>
     </div>
   </div>
-  <div><PieChart /></div>
 </template>
 
 <script>
 import PieChart from "./Pie.vue";
+import vue3starRatings from "vue3-star-ratings";
 export default {
   name: "Dashboard",
   data() {
     return {
+      rating: [],
+      questons: [],
+      showquestons: true,
+      questonsdata: [],
       name: null,
+      titles: ["value 0", "value 1", "value 2", "value 3", "value 4", "value 5"],
+      values: [200, 55, 13, 43, 22],
     };
   },
   created() {
+    this.getAnswersByQuestion();
+    console.log(window.Laravel.user);
     if (window.Laravel.user) {
       this.name = window.Laravel.user.name;
     }
@@ -72,8 +52,81 @@ export default {
     }
     next();
   },
+  methods: {
+    responseQuetions() {
+      if (this.rating.length > 0) {
+        this.$axios.get("/sanctum/csrf-cookie").then((response) => {
+          this.$axios
+            .post("api/responseQuetions", {
+              data: this.rating,
+            })
+            .then((response) => {
+              console.log("ok");
+            })
+            .catch(function (error) {
+              console.error(error);
+            });
+        });
+      }
+    },
+    getAnswersByQuestion() {
+      this.$axios.get("/sanctum/csrf-cookie").then((response) => {
+        this.$axios
+          .get("api/getAnswersByQuestion")
+          .then((response) => {
+            this.questonsdata = response.data;
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
+      });
+    },
+    getQuestions() {
+      this.$axios.get("/sanctum/csrf-cookie").then((response) => {
+        this.$axios
+          .get("api/getquestions")
+          .then((response) => {
+            this.questons = response.data;
+            this.questons.map((el) => {
+              this.rating.push({ value: "", question_id: el.id });
+            });
+
+            !this.questons.length
+              ? (this.showquestions = true)
+              : (this.showquestions = false);
+            console.log(this.showquestons);
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
+      });
+    },
+    checkUserAnswered() {
+      this.$axios.get("/sanctum/csrf-cookie").then((response) => {
+        this.$axios
+          .get("api/getquestions")
+          .then((response) => {
+            this.questons = response.data;
+            this.questons.map((el) => {
+              this.rating.push({ value: "", question_id: el.id });
+            });
+
+            !this.questons.length
+              ? (this.showquestions = true)
+              : (this.showquestions = false);
+            console.log(this.showquestons);
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
+      });
+    },
+  },
   components: {
     PieChart,
+    vue3starRatings,
   },
 };
 </script>
