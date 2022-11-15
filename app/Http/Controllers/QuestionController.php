@@ -69,4 +69,14 @@ class QuestionController extends Controller
 
         return $questiondatas;
     }
+    public function checkexiste()
+    {
+        // return Answer::where('user_id', Auth::id())->exists() ? "true" : "false";
+        // return isset($hasanswer) &&  $hasanswer ;
+        $exite = null;
+        if (Answer::where('user_id', Auth::id())->exists()) $exite = "true";
+        if (Answer::where('user_id', Auth::id())->doesntExist())
+            $exite = "false";
+        return $exite;
+    }
 }

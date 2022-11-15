@@ -4,7 +4,7 @@
       <list-item v-for="(item, index) in questons"
         ><h1>{{ item.title }}</h1>
         <h4>{{ item.text }}</h4>
-        <vue3-star-ratings v-model="rating[index].value" :numberOfStars="5" :step="1" />
+        <vue3-star-ratings v-model="rating[index].value" :step="1" disableClick="true" />
       </list-item>
       <button class="btn btn-success" @click="responseQuetions">Submit</button>
     </div>
@@ -40,7 +40,7 @@ export default {
     };
   },
   created() {
-    this.getAnswersByQuestion();
+    this.checkUserAnswered();
     console.log(window.Laravel.user);
     if (window.Laravel.user) {
       this.name = window.Laravel.user.name;
@@ -70,6 +70,7 @@ export default {
       }
     },
     getAnswersByQuestion() {
+      this.showquestons = false;
       this.$axios.get("/sanctum/csrf-cookie").then((response) => {
         this.$axios
           .get("api/getAnswersByQuestion")
@@ -82,6 +83,7 @@ export default {
       });
     },
     getQuestions() {
+      this.showquestons = true;
       this.$axios.get("/sanctum/csrf-cookie").then((response) => {
         this.$axios
           .get("api/getquestions")
@@ -105,18 +107,10 @@ export default {
     checkUserAnswered() {
       this.$axios.get("/sanctum/csrf-cookie").then((response) => {
         this.$axios
-          .get("api/getquestions")
+          .get("api/checkexiste")
           .then((response) => {
-            this.questons = response.data;
-            this.questons.map((el) => {
-              this.rating.push({ value: "", question_id: el.id });
-            });
-
-            !this.questons.length
-              ? (this.showquestions = true)
-              : (this.showquestions = false);
-            console.log(this.showquestons);
             console.log(response.data);
+            response.data == true ? this.getAnswersByQuestion() : this.getQuestions();
           })
           .catch(function (error) {
             console.error(error);

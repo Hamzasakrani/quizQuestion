@@ -28,3 +28,6 @@ Route::post('responseQuetions', [
 Route::get('getAnswersByQuestion', [
     QuestionController::class, "getAnswersByQuestion"
 ])->middleware('auth:sanctum');
+Route::get('checkexiste', [
+    QuestionController::class, "checkexiste"
+])->middleware('auth:sanctum');
